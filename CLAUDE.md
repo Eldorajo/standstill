@@ -14,23 +14,31 @@ Director of Internal Audit, Chief of Staff, VP of Operations, CFO at mid-to-larg
 
 ## Features
 [
-  "Microsoft Graph + Google Workspace connectors (read-only, metadata-first)",
-  "Spreadsheet load-bearing scorer (open frequency, dependency graph, edit graph, breadth of consumers)",
-  "Email-chain process detector (recurring threads with stable participant patterns and forward velocity)",
-  "Single-point-of-failure clustering by individual contributor across artifacts",
-  "Risk dashboard with scored findings, owner identification, and recommended actions",
-  "Quarterly audit-trail report export (PDF) for executive review",
-  "Privacy-fortress posture: tenant-scoped data, no egress beyond customer perimeter"
+  "Single-tenant React + Supabase app with email/password auth",
+  "Guided self-audit form: capture shadow workflows (name, owner, frequency, breadth, criticality, SPOF risk)",
+  "Heuristic scoring engine — transparent, explainable, every score broken down by named inputs",
+  "Findings dashboard: top-N ranked workflows with score breakdown and recommended action",
+  "Claude-assisted audit report (Markdown export; PDF export deferred to v0.2)",
+  "Audit-grade UI: sober, evidence-led, no gamification, frame outputs as knowledge concentration not personal risk"
 ]
 
 ## Stack
 {
-  "design": "Neumorphism slate (default Dynamic-Ally aesthetic)",
+  "ai": [
+    "Anthropic Claude API"
+  ],
+  "build": "Dynamic-Ally orchestrator (Bolt.new prompt-driven)",
+  "deploy": "Netlify",
+  "design": "Slate / Neumorphism (Dynamic-Ally default)",
   "backend": [
     "Supabase Postgres",
+    "Edge Functions (Deno)"
+  ],
+  "deferred": [
     "pgvector",
-    "Edge Functions (Deno)",
-    "pg_net for async orchestration"
+    "Microsoft Graph",
+    "Google Workspace",
+    "multi-tenant"
   ],
   "frontend": [
     "React",
@@ -40,11 +48,6 @@ Director of Internal Audit, Chief of Staff, VP of Operations, CFO at mid-to-larg
     "shadcn/ui",
     "Framer Motion",
     "Lucide"
-  ],
-  "integrations": [
-    "Microsoft Graph API",
-    "Google Workspace API",
-    "SSO/OIDC for tenant auth"
   ]
 }
 
@@ -99,17 +102,18 @@ Director of Internal Audit, Chief of Staff, VP of Operations, CFO at mid-to-larg
 - [principle] Metadata-first, content opt-in
 - [principle] Frame findings as knowledge concentration, never as personal risk
 - [principle] Every score is explainable
-- [constraint] Multi-tenant by default with strict RLS isolation
 - [constraint] No data egress beyond the customer perimeter
 - [anti_pattern] Do not name individuals in any default view
 - [quality_bar] False-positive rate on load-bearing flags below 20% by end of pilot
 - [user_promise] A pilot is operable by the customer's platform team in under two days
+- [constraint] Schema designed multi-tenant-ready, single-tenant deployment in v1
+- [goal] Ship v1 as a working self-audit dashboard within Sprint 1
 
 ## Integrations
-- Microsoft Graph
-- Google Workspace
 - Anthropic Claude
 - Supabase Vault
+- Microsoft Graph
+- Google Workspace
 
 ## Env
 See .env.example
