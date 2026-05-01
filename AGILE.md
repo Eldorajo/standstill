@@ -1,14 +1,14 @@
 # Standstill — Project Status
 
-> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-01 23:30:53 UTC
+> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-01 23:36:13 UTC
 
 ## Overview
 
 | | |
 |---|---|
 | **Status** | active |
-| **Progress** | 8% (3/37 points) |
-| **Stories** | 1 done, 0 in progress, 8 planned, 0 blocked |
+| **Progress** | 30% (11/37 points) |
+| **Stories** | 3 done, 2 in progress, 4 planned, 0 blocked |
 | **Epics** | 5 |
 | **Sprints** | 2 |
 
@@ -21,7 +21,7 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 ## Sprint Board
 
 ### Sprint 1: Ship a working v1: scaffold + auth + workflow capture + scorer + findings list. By end of sprint, a Chief of Staff can sign in, capture 5 workflows, see them scored and ranked. (planning)
-3/21 points | 2026-05-04 → 2026-05-15
+11/21 points | 2026-05-04 → 2026-05-15
 
 ### Sprint 2: Polish + persistence: edit workflows, PDF export, file upload for evidence (CSV first), per-org weight tuning. Builds on a working v1. (planning)
 0/16 points | 2026-05-18 → 2026-05-29
@@ -31,23 +31,23 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 | Story | Title | Points | Assignee | Completed |
 |-------|-------|--------|----------|-----------|
 | ST-002 | Schema: workflows, scores, audit_reports — multi-tenant-ready columns from day one | 3 | Claude Code | 2026-05-01 |
+| ST-003 | Workflow capture form (single-page, save to workflows table) | 5 | Claude Code | 2026-05-01 |
+| ST-004 | Heuristic scorer v1 with explainable breakdown | 3 | Claude Code | 2026-05-01 |
 
 ### In Progress 🔄
 
 | Story | Title | Points | Assignee | Started |
 |-------|-------|--------|----------|---------|
+| ST-007 | Workflow editing + delete | 3 | Claude Code | 2026-05-01 |
+| ST-009 | CSV upload — capture multiple workflows at once | 5 | Claude Code | 2026-05-01 |
 
 ### Planned 📋
 
 | Story | Title | Points | Priority | Epic |
 |-------|-------|--------|----------|------|
-| ST-003 | Workflow capture form (single-page, save to workflows table) | 5 | high | ST-E2 |
-| ST-004 | Heuristic scorer v1 with explainable breakdown | 3 | high | ST-E3 |
 | ST-005 | Findings dashboard — ranked list with score breakdown | 3 | high | ST-E4 |
 | ST-006 | Audit report v1 — Claude-assisted Markdown | 2 | medium | ST-E5 |
-| ST-007 | Workflow editing + delete | 3 | high | ST-E2 |
 | ST-008 | PDF export of audit reports | 3 | medium | ST-E5 |
-| ST-009 | CSV upload — capture multiple workflows at once | 5 | medium | ST-E2 |
 | ST-010 | Score weight tuning per deployment | 5 | low | ST-E4 |
 
 ## Epics
@@ -55,10 +55,10 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 ### ST-E1: Foundation (1/2 stories done)
 React + Supabase scaffold. Auth (email/password). Single-tenant schema with multi-tenant-ready columns. Dashboard shell with sidebar nav.
 
-### ST-E2: Workflow Capture (0/3 stories done)
+### ST-E2: Workflow Capture (1/3 stories done)
 Guided self-audit form. Multi-step capture of shadow workflows (name, owner, frequency, breadth, criticality, SPOF risk). Edit + delete + list.
 
-### ST-E3: Heuristic Scoring Engine (0/1 stories done)
+### ST-E3: Heuristic Scoring Engine (1/1 stories done)
 Transparent, explainable scoring. Each finding gets a 0–100 score with a published breakdown by named input. Score history persisted per workflow so trends are queryable.
 
 ### ST-E4: Findings Dashboard (0/2 stories done)
@@ -87,6 +87,8 @@ Claude-assisted Markdown report from scored findings. Render in browser, copy/sh
 
 | Date | Decision | Rationale | By |
 |------|----------|-----------|-----|
+| 2026-05-01 | Built ST-004: Heuristic scorer v1 with explainable breakdown | Files: supabase/functions/ss-score/index.ts, supabase/functions/ss-score/deno.json, supabase/functions/_shared/cors.ts, lib/scoring.ts, supabase/functions/import_map.json | claude_code |
+| 2026-05-01 | Built ST-003: Workflow capture form (single-page, save to workflows table) | Files: src/lib/scoring.ts, src/components/ScoreBreakdown.tsx, src/pages/Capture.tsx | claude_code |
 | 2026-05-01 | Built ST-002: Schema: workflows, scores, audit_reports — multi-tenant-ready columns from day one | Files: supabase/migrations/20260501000000_initial_schema.sql, src/lib/types.ts | claude_code |
 | 2026-05-01 | Built ST-001: Project scaffold + Supabase auth + dashboard shell | Files: package.json, tsconfig.json, tsconfig.node.json, vite.config.ts, tailwind.config.js, postcss.config.js, index.html, .env.example, .gitignore, README.md, src/main.tsx, src/App.tsx, src/index.css, src/lib/supabase.ts, src/components/ui.tsx, src/components/AuthGuard.tsx, src/components/Layout.tsx, src/pages/Login.tsx | claude_code |
 
@@ -94,6 +96,10 @@ Claude-assisted Markdown report from scored findings. Render in browser, copy/sh
 
 | Story | Status | Summary | Date |
 |-------|--------|---------|------|
+| ST-009 | dispatched |  | 2026-05-01T23:35 |
+| ST-007 | dispatched |  | 2026-05-01T23:35 |
+| ST-004 | success | Built 5 files | 2026-05-01T23:34 |
+| ST-003 | success | Built 3 files | 2026-05-01T23:31 |
 | ST-002 | success | Built 2 files | 2026-05-01T23:28 |
 | ST-001 | success | Built 18 files | 2026-05-01T22:59 |
 | SS-001 | failed |  | 2026-05-01T21:36 |
@@ -197,7 +203,7 @@ None for the migration file (already applied). Types depend on nothing.
 - All other story files compile against these types without casting
 
 ### ST-003: Workflow capture form (single-page, save to workflows table)
-- **Status:** planned | **Points:** 5 | **Priority:** high | **Epic:** ST-E2
+- **Status:** done | **Points:** 5 | **Priority:** high | **Epic:** ST-E2
 - **Description:** # ST-003: Workflow capture form
 
 ## Goal
@@ -253,7 +259,7 @@ A multi-field form that captures everything ss-score needs to rank a workflow. L
 - After successful save, user lands on /findings
 
 ### ST-004: Heuristic scorer v1 with explainable breakdown
-- **Status:** planned | **Points:** 3 | **Priority:** high | **Epic:** ST-E3
+- **Status:** done | **Points:** 3 | **Priority:** high | **Epic:** ST-E3
 - **Description:** # ST-004: ss-score edge function (already deployed)
 
 ## Goal
@@ -452,7 +458,7 @@ ANTHROPIC_API_KEY is read from Deno.env (set in the Supabase project's secrets �
 - supabase/functions/ss-report/index.ts in the repo matches the deployed function exactly
 
 ### ST-007: Workflow editing + delete
-- **Status:** planned | **Points:** 3 | **Priority:** high | **Epic:** ST-E2
+- **Status:** in_progress | **Points:** 3 | **Priority:** high | **Epic:** ST-E2
 - **Description:** # ST-007: Edit and delete captured workflows
 
 ## Goal
@@ -505,7 +511,7 @@ v1 ships Markdown-only reports. Customers want a polished PDF for their board, a
 - Generation happens entirely client-side
 
 ### ST-009: CSV upload — capture multiple workflows at once
-- **Status:** planned | **Points:** 5 | **Priority:** medium | **Epic:** ST-E2
+- **Status:** in_progress | **Points:** 5 | **Priority:** medium | **Epic:** ST-E2
 - **Description:** # ST-009: CSV import
 
 ## Goal
