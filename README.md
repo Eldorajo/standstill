@@ -1,29 +1,42 @@
 # Standstill
 
-Standstill maps the hidden layer of work that keeps enterprises running - the spreadsheets that became load-bearing, the email chains that became processes, and the workflows that exist only because one person remembers how they work.
+A guided self-audit dashboard for shadow workflow risk in enterprises.
 
-## Development
+## v1 Scope
 
-1. Copy `.env.example` to `.env` and fill in your Supabase credentials
-2. Install dependencies: `npm install`
-3. Start development server: `npm run dev`
-4. Build for production: `npm run build`
-
-## Architecture
-
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **Backend**: Supabase (Postgres + Edge Functions)
-- **Auth**: Supabase Auth
-- **Design**: Slate color palette with Neumorphism styling
-- **Icons**: Lucide React
+- **Capture**: Structured form for shadow workflow input
+- **Score**: Transparent heuristic scoring of workflows
+- **Report**: Claude-assisted audit report generation
 
 ## Tech Stack
 
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Router
-- Supabase
-- Framer Motion
-- Lucide React
+- Frontend: React + TypeScript + Vite + Tailwind + shadcn/ui
+- Backend: Supabase Postgres + Edge Functions
+- AI: Anthropic Claude API
+- Auth: Supabase email/password
+- Deploy: Netlify
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Visit http://localhost:5173
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and fill in your Supabase credentials:
+
+```
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+## Architecture
+
+- Single-tenant for v1 (multi-tenant-ready schema)
+- No OAuth integrations in v1
+- Heuristic scoring only (no ML)
+- Privacy-first: no individual naming in default views
