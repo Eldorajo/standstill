@@ -1,14 +1,14 @@
 # Standstill — Project Status
 
-> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-01 23:28:17 UTC
+> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-01 23:30:53 UTC
 
 ## Overview
 
 | | |
 |---|---|
 | **Status** | active |
-| **Progress** | 0% (0/37 points) |
-| **Stories** | 0 done, 0 in progress, 9 planned, 0 blocked |
+| **Progress** | 8% (3/37 points) |
+| **Stories** | 1 done, 0 in progress, 8 planned, 0 blocked |
 | **Epics** | 5 |
 | **Sprints** | 2 |
 
@@ -21,7 +21,7 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 ## Sprint Board
 
 ### Sprint 1: Ship a working v1: scaffold + auth + workflow capture + scorer + findings list. By end of sprint, a Chief of Staff can sign in, capture 5 workflows, see them scored and ranked. (planning)
-0/21 points | 2026-05-04 → 2026-05-15
+3/21 points | 2026-05-04 → 2026-05-15
 
 ### Sprint 2: Polish + persistence: edit workflows, PDF export, file upload for evidence (CSV first), per-org weight tuning. Builds on a working v1. (planning)
 0/16 points | 2026-05-18 → 2026-05-29
@@ -30,6 +30,7 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 
 | Story | Title | Points | Assignee | Completed |
 |-------|-------|--------|----------|-----------|
+| ST-002 | Schema: workflows, scores, audit_reports — multi-tenant-ready columns from day one | 3 | Claude Code | 2026-05-01 |
 
 ### In Progress 🔄
 
@@ -40,7 +41,6 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 
 | Story | Title | Points | Priority | Epic |
 |-------|-------|--------|----------|------|
-| ST-002 | Schema: workflows, scores, audit_reports — multi-tenant-ready columns from day one | 3 | critical | ST-E1 |
 | ST-003 | Workflow capture form (single-page, save to workflows table) | 5 | high | ST-E2 |
 | ST-004 | Heuristic scorer v1 with explainable breakdown | 3 | high | ST-E3 |
 | ST-005 | Findings dashboard — ranked list with score breakdown | 3 | high | ST-E4 |
@@ -52,7 +52,7 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 
 ## Epics
 
-### ST-E1: Foundation (0/2 stories done)
+### ST-E1: Foundation (1/2 stories done)
 React + Supabase scaffold. Auth (email/password). Single-tenant schema with multi-tenant-ready columns. Dashboard shell with sidebar nav.
 
 ### ST-E2: Workflow Capture (0/3 stories done)
@@ -87,12 +87,14 @@ Claude-assisted Markdown report from scored findings. Render in browser, copy/sh
 
 | Date | Decision | Rationale | By |
 |------|----------|-----------|-----|
+| 2026-05-01 | Built ST-002: Schema: workflows, scores, audit_reports — multi-tenant-ready columns from day one | Files: supabase/migrations/20260501000000_initial_schema.sql, src/lib/types.ts | claude_code |
 | 2026-05-01 | Built ST-001: Project scaffold + Supabase auth + dashboard shell | Files: package.json, tsconfig.json, tsconfig.node.json, vite.config.ts, tailwind.config.js, postcss.config.js, index.html, .env.example, .gitignore, README.md, src/main.tsx, src/App.tsx, src/index.css, src/lib/supabase.ts, src/components/ui.tsx, src/components/AuthGuard.tsx, src/components/Layout.tsx, src/pages/Login.tsx | claude_code |
 
 ## Build History
 
 | Story | Status | Summary | Date |
 |-------|--------|---------|------|
+| ST-002 | success | Built 2 files | 2026-05-01T23:28 |
 | ST-001 | success | Built 18 files | 2026-05-01T22:59 |
 | SS-001 | failed |  | 2026-05-01T21:36 |
 
@@ -153,7 +155,7 @@ None — this is the foundation.
 - Slate / Neumorphism aesthetic visibly applied (dark surface, accent dot, mono kickers)
 
 ### ST-002: Schema: workflows, scores, audit_reports — multi-tenant-ready columns from day one
-- **Status:** planned | **Points:** 3 | **Priority:** critical | **Epic:** ST-E1
+- **Status:** done | **Points:** 3 | **Priority:** critical | **Epic:** ST-E1
 - **Description:** # ST-002: Schema (already applied) + TypeScript types
 
 ## Goal
