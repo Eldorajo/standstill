@@ -51,42 +51,25 @@ Director of Internal Audit, Chief of Staff, VP of Operations, CFO at mid-to-larg
 ## Design
 {
   "aesthetic": {
-    "mood": "audit-grade, sober, evidence-led, documentary",
-    "style": "Neumorphism",
-    "description": "audit-grade, sober, evidence-led, documentary"
+    "style": "Glassmorphism",
+    "description": "Glassmorphism"
   },
   "color": {
-    "dim": "#5C6166",
-    "elev": "#111316",
-    "text": "#F2F3F5",
-    "muted": "#9AA0A6",
-    "accent": "#818CF8",
-    "border": "rgba(255,255,255,0.08)",
     "family": "Slate",
-    "sunken": "#06070A",
     "primary": "#818CF8",
-    "surface": "#0A0B0D",
-    "risk_low": "#34D399",
-    "risk_med": "#F59E0B",
-    "risk_high": "#F87171",
-    "border_strong": "rgba(255,255,255,0.16)"
+    "surface": "#0A0B0D"
   },
   "fonts": {
-    "mono": "IBM Plex Mono",
-    "sans": "Inter",
-    "display": "Inter (tight tracking)",
     "body_font": "Inter",
-    "mono_font": "IBM Plex Mono",
-    "heading_font": "Inter"
+    "heading_font": "Inter",
+    "google_fonts_url": "https://fonts.googleapis.com/css2?family=Inter&family=Inter&display=swap"
   },
   "framework": {
-    "library": "shadcn/ui",
-    "framework": "Tailwind",
+    "framework": "shadcn/ui",
     "description": "shadcn/ui"
   },
   "icons": {
-    "set": "Lucide",
-    "library": "Lucide"
+    "set": "Lucide"
   }
 }
 
