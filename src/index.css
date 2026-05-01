@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-surface text-ink;
+  }
+}
+
+@layer components {
+  .neu-card {
+    @apply bg-elev border border-border rounded-xl shadow-neu;
+  }
+  
+  .neu-sunken {
+    @apply bg-sunken border border-border rounded-lg shadow-neu-inset;
+  }
+  
+  .kicker {
+    @apply font-mono text-xs uppercase tracking-wide text-muted;
+  }
+}
