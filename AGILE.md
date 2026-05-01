@@ -1,6 +1,6 @@
 # Standstill — Project Status
 
-> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-01 22:58:56 UTC
+> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-01 23:23:39 UTC
 
 ## Overview
 
@@ -8,7 +8,7 @@
 |---|---|
 | **Status** | active |
 | **Progress** | 0% (0/37 points) |
-| **Stories** | 0 done, 0 in progress, 10 planned, 0 blocked |
+| **Stories** | 0 done, 0 in progress, 9 planned, 0 blocked |
 | **Epics** | 5 |
 | **Sprints** | 2 |
 
@@ -40,7 +40,6 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 
 | Story | Title | Points | Priority | Epic |
 |-------|-------|--------|----------|------|
-| ST-001 | Project scaffold + Supabase auth + dashboard shell | 5 | critical | ST-E1 |
 | ST-002 | Schema: workflows, scores, audit_reports — multi-tenant-ready columns from day one | 3 | critical | ST-E1 |
 | ST-003 | Workflow capture form (single-page, save to workflows table) | 5 | high | ST-E2 |
 | ST-004 | Heuristic scorer v1 with explainable breakdown | 3 | high | ST-E3 |
@@ -84,16 +83,23 @@ Claude-assisted Markdown report from scored findings. Render in browser, copy/sh
 | constraint | Schema designed multi-tenant-ready, single-tenant deployment in v1 | should | architecture |
 | goal | Ship v1 as a working self-audit dashboard within Sprint 1 | must | strategy |
 
+## Decision Log
+
+| Date | Decision | Rationale | By |
+|------|----------|-----------|-----|
+| 2026-05-01 | Built ST-001: Project scaffold + Supabase auth + dashboard shell | Files: package.json, tsconfig.json, tsconfig.node.json, vite.config.ts, tailwind.config.js, postcss.config.js, index.html, .env.example, .gitignore, README.md, src/main.tsx, src/App.tsx, src/index.css, src/lib/supabase.ts, src/components/ui.tsx, src/components/AuthGuard.tsx, src/components/Layout.tsx, src/pages/Login.tsx | claude_code |
+
 ## Build History
 
 | Story | Status | Summary | Date |
 |-------|--------|---------|------|
+| ST-001 | success | Built 18 files | 2026-05-01T22:59 |
 | SS-001 | failed |  | 2026-05-01T21:36 |
 
 ## Story Details
 
 ### ST-001: Project scaffold + Supabase auth + dashboard shell
-- **Status:** planned | **Points:** 5 | **Priority:** critical | **Epic:** ST-E1
+- **Status:** review | **Points:** 5 | **Priority:** critical | **Epic:** ST-E1
 - **Description:** # ST-001: Project scaffold + auth + dashboard shell
 
 ## Goal
