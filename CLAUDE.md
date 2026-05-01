@@ -110,10 +110,10 @@ Director of Internal Audit, Chief of Staff, VP of Operations, CFO at mid-to-larg
 - [goal] Ship v1 as a working self-audit dashboard within Sprint 1
 
 ## Integrations
-- Anthropic Claude
 - Supabase Vault
 - Microsoft Graph
 - Google Workspace
+- Anthropic Claude
 
 ## Env
 See .env.example
