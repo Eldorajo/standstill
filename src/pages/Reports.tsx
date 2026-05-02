@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { FileText, Plus } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
+import { FileText, Clock, Users } from 'lucide-react'
 import { Button, Card, Spinner } from '../components/ui'
 import { supabase, FUNCTIONS_URL } from '../lib/supabase'
+import ReactMarkdown from 'react-markdown'
 import type { AuditReport } from '../lib/types'
 
 function Reports() {
@@ -18,18 +18,17 @@ function Reports() {
 
   async function loadReports() {
     try {
-      const { data, error: fetchError } = await supabase
+      const { data: reportsData, error: reportsError } = await supabase
         .from('ss_audit_reports')
         .select('*')
         .order('generated_at', { ascending: false })
-      
-      if (fetchError) throw fetchError
-      
-      setReports(data || [])
-      
-      // Auto-select the most recent report if any exist
-      if (data && data.length > 0 && !selectedReport) {
-        setSelectedReport(data[0])
+
+      if (reportsError) throw reportsError
+
+      setReports(reportsData || [])
+      // Auto-select the most recent if any exist
+      if (reportsData && reportsData.length > 0) {
+        setSelectedReport(reportsData[0])
       }
     } catch (e: any) {
       setError(e?.message || 'Failed to load reports')
@@ -41,13 +40,12 @@ function Reports() {
   async function generateReport() {
     setGenerating(true)
     setError(null)
-    
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) {
-        throw new Error('Not authenticated')
+        throw new Error('No valid session')
       }
-      
+
       const response = await fetch(`${FUNCTIONS_URL}/ss-report`, {
         method: 'POST',
         headers: {
@@ -56,19 +54,22 @@ function Reports() {
         },
         body: JSON.stringify({}),
       })
-      
-      const result = await response.json()
-      
+
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to generate report')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to generate report')
       }
-      
-      // Refetch reports and select the new one
+
+      const data = await response.json()
+      if (!data.ok) {
+        throw new Error(data.error || 'Failed to generate report')
+      }
+
+      // Refresh reports list and select the new report
       await loadReports()
-      
-      // The new report should be first in the list
-      if (result.report) {
-        setSelectedReport(result.report)
+      const newReport = data.report
+      if (newReport) {
+        setSelectedReport(newReport)
       }
     } catch (e: any) {
       setError(e?.message || 'Failed to generate report')
@@ -77,13 +78,13 @@ function Reports() {
     }
   }
 
-  function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
+  function formatDate(dateString: string) {
+    return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
     })
   }
 
@@ -95,16 +96,6 @@ function Reports() {
     )
   }
 
-  if (error && reports.length === 0) {
-    return (
-      <div className="p-8">
-        <div className="text-sm text-risk-high bg-risk-high/10 border border-risk-high/20 px-3 py-2 rounded-lg">
-          {error}
-        </div>
-      </div>
-    )
-  }
-
   if (reports.length === 0) {
     return (
       <div className="p-8">
@@ -112,26 +103,21 @@ function Reports() {
           <div className="mb-8">
             <p className="kicker mb-2">reports · step 3</p>
             <h1 className="text-3xl font-semibold text-ink">Audit reports</h1>
-            <p className="text-muted mt-1">Generate Claude-assisted analysis of your workflow risks.</p>
+            <p className="text-muted mt-1">No reports generated yet.</p>
           </div>
           
           <Card className="text-center py-12">
             <FileText className="h-12 w-12 text-muted mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-ink mb-2">No reports yet</h2>
-            <p className="text-muted mb-6">
-              Generate your first audit report from captured workflow findings.
-            </p>
+            <h2 className="text-xl font-semibold text-ink mb-2">Generate your first report</h2>
+            <p className="text-muted mb-6">Capture workflows and get scores, then generate a Claude-assisted audit report.</p>
             <Button onClick={generateReport} disabled={generating}>
               {generating ? (
                 <>
-                  <Spinner className="h-4 w-4 mr-2" />
-                  Generating
+                  <Spinner className="mr-2" />
+                  Generating report...
                 </>
               ) : (
-                <>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Generate report
-                </>
+                'Generate report'
               )}
             </Button>
             {error && (
@@ -152,19 +138,16 @@ function Reports() {
           <div>
             <p className="kicker mb-2">reports · step 3</p>
             <h1 className="text-3xl font-semibold text-ink">Audit reports</h1>
-            <p className="text-muted mt-1">{reports.length} reports generated</p>
+            <p className="text-muted mt-1">{reports.length} report{reports.length !== 1 ? 's' : ''} generated</p>
           </div>
           <Button onClick={generateReport} disabled={generating}>
             {generating ? (
               <>
-                <Spinner className="h-4 w-4 mr-2" />
-                Generating
+                <Spinner className="mr-2" />
+                Generating...
               </>
             ) : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Generate report
-              </>
+              'Generate report'
             )}
           </Button>
         </div>
@@ -175,12 +158,12 @@ function Reports() {
           </div>
         )}
 
-        <div className="grid grid-cols-4 gap-6 h-[calc(100vh-200px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* History sidebar */}
-          <div className="col-span-1">
-            <Card className="h-full">
-              <h3 className="text-lg font-semibold text-ink mb-4">Report history</h3>
-              <div className="space-y-2 overflow-y-auto">
+          <div className="lg:col-span-1">
+            <Card className="p-4">
+              <h3 className="font-semibold text-ink mb-4">Report history</h3>
+              <div className="space-y-2">
                 {reports.map((report) => (
                   <button
                     key={report.id}
@@ -191,11 +174,17 @@ function Reports() {
                         : 'text-muted hover:text-ink hover:bg-elev/50'
                     }`}
                   >
-                    <div className="text-sm font-medium mb-1">
-                      {formatDate(report.generated_at)}
+                    <div className="flex items-center space-x-2 mb-1">
+                      <Clock className="h-4 w-4" />
+                      <span className="text-xs font-mono">
+                        {formatDate(report.generated_at)}
+                      </span>
                     </div>
-                    <div className="text-xs opacity-75">
-                      {report.workflow_count} workflows
+                    <div className="flex items-center space-x-2">
+                      <Users className="h-4 w-4" />
+                      <span className="text-xs">
+                        {report.workflow_count} workflow{report.workflow_count !== 1 ? 's' : ''}
+                      </span>
                     </div>
                   </button>
                 ))}
@@ -204,23 +193,39 @@ function Reports() {
           </div>
 
           {/* Report content */}
-          <div className="col-span-3">
-            <Card className="h-full overflow-hidden">
-              {selectedReport ? (
-                <div className="h-full overflow-y-auto">
-                  <div className="prose prose-invert prose-slate max-w-none">
-                    <ReactMarkdown>{selectedReport.content_md}</ReactMarkdown>
+          <div className="lg:col-span-3">
+            {selectedReport ? (
+              <Card className="p-6">
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-xl font-semibold text-ink">Audit Report</h2>
+                    <div className="flex items-center space-x-4 text-xs text-muted">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-3 w-3" />
+                        <span>{formatDate(selectedReport.generated_at)}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-3 w-3" />
+                        <span>{selectedReport.workflow_count} workflows</span>
+                      </div>
+                      {selectedReport.claude_model && (
+                        <div className="flex items-center space-x-1">
+                          <span className="font-mono">{selectedReport.claude_model}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              ) : (
-                <div className="h-full flex items-center justify-center text-muted">
-                  <div className="text-center">
-                    <FileText className="h-12 w-12 mx-auto mb-4" />
-                    <p>Select a report from the sidebar</p>
-                  </div>
+                
+                <div className="prose prose-invert prose-slate max-w-none">
+                  <ReactMarkdown>{selectedReport.content_md}</ReactMarkdown>
                 </div>
-              )}
-            </Card>
+              </Card>
+            ) : (
+              <Card className="p-6 text-center">
+                <p className="text-muted">Select a report from the history to view its contents.</p>
+              </Card>
+            )}
           </div>
         </div>
       </div>
