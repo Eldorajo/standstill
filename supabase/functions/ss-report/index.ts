@@ -57,14 +57,40 @@ serve(async (req) => {
       )
     }
 
-    // Fetch all workflows for the user
-    const { data: workflows, error: workflowError } = await supabase
-      .from('ss_workflows')
-      .select('id, name, spof_risk')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
+    // Get user's default tenant
+    const { data: tenant, error: tenantError } = await supabase
+      .from('ss_tenants')
+      .select('id')
+      .eq('owner_user_id', user.id)
+      .single()
 
-    if (workflowError) {
+    if (tenantError || !tenant) {
+      // Create default tenant if it doesn't exist
+      const { data: newTenant, error: createError } = await supabase
+        .from('ss_tenants')
+        .insert({
+          owner_user_id: user.id,
+          name: 'Default Organization'
+        })
+        .select('id')
+        .single()
+      
+      if (createError || !newTenant) {
+        return new Response(
+          JSON.stringify({ ok: false, error: 'Failed to create tenant' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      tenant.id = newTenant.id
+    }
+
+    // Fetch all workflows for the user
+    const { data: workflows, error: workflowsError } = await supabase
+      .from('ss_workflows')
+      .select('id, name, owner_name, spof_risk')
+      .eq('user_id', user.id)
+
+    if (workflowsError) {
       return new Response(
         JSON.stringify({ ok: false, error: 'Failed to fetch workflows' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -106,62 +132,58 @@ serve(async (req) => {
     const workflowSummaries: WorkflowSummary[] = []
     for (const workflow of workflows) {
       const score = latestScores.get(workflow.id)
-      if (!score) continue // Skip workflows without scores
-
-      // Determine primary risk driver from score breakdown
-      let primaryDriver = 'none'
-      const breakdown = score.score_breakdown
-      if (breakdown) {
-        let maxContribution = 0
-        for (const [key, value] of Object.entries(breakdown)) {
-          if (typeof value === 'object' && value !== null && 'contribution' in value) {
-            const contribution = (value as any).contribution || (value as any)[key.replace('_score', '')] || 0
-            if (contribution > maxContribution) {
-              maxContribution = contribution
-              primaryDriver = key.replace('_score', '').replace('_', ' ')
+      if (score) {
+        // Determine primary risk driver from score breakdown
+        let primaryDriver = 'unknown'
+        if (score.score_breakdown) {
+          const breakdown = score.score_breakdown
+          let maxContribution = 0
+          let maxKey = 'unknown'
+          
+          for (const [key, value] of Object.entries(breakdown)) {
+            if (typeof value === 'object' && value !== null && 'contribution' in (value as any)) {
+              const contribution = (value as any).contribution || 0
+              if (contribution > maxContribution) {
+                maxContribution = contribution
+                maxKey = key
+              }
+            } else if (key.endsWith('_score') && typeof value === 'number' && value > maxContribution) {
+              maxContribution = value
+              maxKey = key.replace('_score', '')
             }
-          } else if (key.endsWith('_score') && typeof value === 'number' && value > maxContribution) {
-            maxContribution = value
-            primaryDriver = key.replace('_score', '').replace('_', ' ')
           }
+          
+          primaryDriver = maxKey.replace('_', ' ')
         }
-      }
 
-      workflowSummaries.push({
-        name: workflow.name,
-        score: score.score,
-        primary_risk_driver: primaryDriver,
-        spof_risk: workflow.spof_risk
-      })
+        workflowSummaries.push({
+          name: workflow.name,
+          score: score.score,
+          primary_risk_driver: primaryDriver,
+          spof_risk: workflow.spof_risk
+        })
+      }
     }
 
     if (workflowSummaries.length === 0) {
       return new Response(
-        JSON.stringify({ ok: false, error: 'No scored workflows found' }),
+        JSON.stringify({ ok: false, error: 'No scored workflows available' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Sort workflows by score descending
-    workflowSummaries.sort((a, b) => b.score - a.score)
-
     // Prepare structured input for Claude
-    const top5ByScore = workflowSummaries.slice(0, 5)
     const spofWorkflows = workflowSummaries.filter(w => w.spof_risk).slice(0, 5)
-    const avgScore = workflowSummaries.reduce((sum, w) => sum + w.score, 0) / workflowSummaries.length
+    const topScored = [...workflowSummaries].sort((a, b) => b.score - a.score).slice(0, 5)
     
     const claudeInput = {
-      workflow_count: workflowSummaries.length,
-      average_score: Math.round(avgScore * 100) / 100,
-      top_5_by_score: top5ByScore,
-      spof_workflows: spofWorkflows,
-      risk_drivers: {
-        frequency: workflowSummaries.filter(w => w.primary_risk_driver === 'frequency').length,
-        breadth: workflowSummaries.filter(w => w.primary_risk_driver === 'breadth').length,
-        criticality: workflowSummaries.filter(w => w.primary_risk_driver === 'criticality').length,
-        spof: workflowSummaries.filter(w => w.primary_risk_driver === 'spof risk').length,
-      }
+      total_workflows: workflowSummaries.length,
+      top_spof_workflows: spofWorkflows.map(w => `${w.name} (score: ${w.score})`),
+      top_scored_workflows: topScored.map(w => `${w.name} (score: ${w.score}, driver: ${w.primary_risk_driver})`),
+      avg_score: Math.round((workflowSummaries.reduce((sum, w) => sum + w.score, 0) / workflowSummaries.length) * 10) / 10
     }
+
+    const claudeInputSummary = JSON.stringify(claudeInput)
 
     // Call Anthropic Claude API
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY')
@@ -172,30 +194,29 @@ serve(async (req) => {
       )
     }
 
-    const prompt = `You are generating an enterprise shadow workflow audit report. Based on the following scored findings, create a comprehensive Markdown report.
+    const prompt = `You are generating an audit report for shadow workflow risk analysis. Be precise, professional, and audit-grade in tone.
 
-**STRICT REQUIREMENTS:**
-- Use audit-grade professional tone, no marketing fluff
-- Frame risks as "knowledge concentration" not "personal risk"
-- NEVER name specific individuals - only refer to roles/functions
-- Focus on organizational resilience, not blame
-- Structure: Executive Summary, Top Risks, SPOF Workflows, Recommended Next Steps, Methodology
+Input data:
+- Total workflows analyzed: ${claudeInput.total_workflows}
+- Average risk score: ${claudeInput.avg_score}/100
+- Top SPOF workflows: ${claudeInput.top_spof_workflows.join(', ')}
+- Highest scored workflows: ${claudeInput.top_scored_workflows.join(', ')}
 
-**FINDINGS DATA:**
-- Total workflows analyzed: ${claudeInput.workflow_count}
-- Average risk score: ${claudeInput.average_score}/100
-- Top 5 highest-risk workflows: ${JSON.stringify(claudeInput.top_5_by_score, null, 2)}
-- Single Point of Failure workflows: ${JSON.stringify(claudeInput.spof_workflows, null, 2)}
-- Primary risk driver distribution: ${JSON.stringify(claudeInput.risk_drivers, null, 2)}
+Generate a Markdown report with these exact sections:
 
-**SCORING METHODOLOGY (include in report):**
-- Frequency: Daily (30pts), Weekly (21pts), Monthly (12pts), Quarterly (3pts)
-- Breadth: Logarithmic scale, max 25pts based on team count
-- Criticality: User-rated 1-5 scale, 4pts per level (max 20pts)
-- SPOF Risk: Boolean, 25pts if true
-- Total possible: 100pts
+# Executive Summary
+# Top Risk Areas
+# Single Point of Failure Workflows  
+# Recommended Next Steps
+# Methodology
 
-Generate the complete audit report in Markdown format.`
+Constraints:
+- Never name specific individuals - only refer to roles (e.g., "senior analyst", "finance lead")
+- Frame issues as "knowledge concentration" not "personal risk"
+- Be specific about which workflows are highest risk
+- Recommend concrete next steps
+- Keep total length under 1500 words
+- Use professional audit language, not marketing copy`
 
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -206,17 +227,18 @@ Generate the complete audit report in Markdown format.`
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 4000,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
+        max_tokens: 2000,
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
       })
     })
 
     if (!claudeResponse.ok) {
-      const errorText = await claudeResponse.text()
-      console.error('Claude API error:', errorText)
+      console.error('Claude API error:', await claudeResponse.text())
       return new Response(
         JSON.stringify({ ok: false, error: 'Failed to generate report with Claude' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -224,23 +246,23 @@ Generate the complete audit report in Markdown format.`
     }
 
     const claudeResult = await claudeResponse.json()
-    const reportContent = claudeResult.content[0].text
+    const reportContent = claudeResult.content?.[0]?.text || 'Report generation failed'
 
-    // Insert audit report into database
+    // Insert the audit report
     const { data: report, error: insertError } = await supabase
       .from('ss_audit_reports')
       .insert({
         content_md: reportContent,
         workflow_count: workflowSummaries.length,
-        claude_input_summary: JSON.stringify(claudeInput),
+        claude_input_summary: claudeInputSummary,
         claude_model: 'claude-3-5-sonnet-20241022',
-        user_id: user.id
+        user_id: user.id,
+        tenant_id: tenant.id
       })
       .select()
       .single()
 
-    if (insertError) {
-      console.error('Database insert error:', insertError)
+    if (insertError || !report) {
       return new Response(
         JSON.stringify({ ok: false, error: 'Failed to save report' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
