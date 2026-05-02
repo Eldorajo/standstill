@@ -1,6 +1,6 @@
 # Standstill — Project Status
 
-> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-01 23:36:13 UTC
+> Auto-generated from SerVet Skill MCP | Last updated: 2026-05-02 02:08:11 UTC
 
 ## Overview
 
@@ -8,7 +8,7 @@
 |---|---|
 | **Status** | active |
 | **Progress** | 30% (11/37 points) |
-| **Stories** | 3 done, 2 in progress, 4 planned, 0 blocked |
+| **Stories** | 3 done, 0 in progress, 2 planned, 2 blocked |
 | **Epics** | 5 |
 | **Sprints** | 2 |
 
@@ -38,17 +38,20 @@ A continuous, read-only audit of the shadow workflow layer. Standstill connects 
 
 | Story | Title | Points | Assignee | Started |
 |-------|-------|--------|----------|---------|
-| ST-007 | Workflow editing + delete | 3 | Claude Code | 2026-05-01 |
-| ST-009 | CSV upload — capture multiple workflows at once | 5 | Claude Code | 2026-05-01 |
 
 ### Planned 📋
 
 | Story | Title | Points | Priority | Epic |
 |-------|-------|--------|----------|------|
-| ST-005 | Findings dashboard — ranked list with score breakdown | 3 | high | ST-E4 |
-| ST-006 | Audit report v1 — Claude-assisted Markdown | 2 | medium | ST-E5 |
 | ST-008 | PDF export of audit reports | 3 | medium | ST-E5 |
 | ST-010 | Score weight tuning per deployment | 5 | low | ST-E4 |
+
+### Blocked 🚫
+
+| Story | Title | Reason |
+|-------|-------|--------|
+| ST-007 | Workflow editing + delete |  |
+| ST-009 | CSV upload — capture multiple workflows at once |  |
 
 ## Epics
 
@@ -96,8 +99,8 @@ Claude-assisted Markdown report from scored findings. Render in browser, copy/sh
 
 | Story | Status | Summary | Date |
 |-------|--------|---------|------|
-| ST-009 | dispatched |  | 2026-05-01T23:35 |
-| ST-007 | dispatched |  | 2026-05-01T23:35 |
+| ST-009 | failed |  | 2026-05-01T23:35 |
+| ST-007 | failed |  | 2026-05-01T23:35 |
 | ST-004 | success | Built 5 files | 2026-05-01T23:34 |
 | ST-003 | success | Built 3 files | 2026-05-01T23:31 |
 | ST-002 | success | Built 2 files | 2026-05-01T23:28 |
@@ -323,7 +326,7 @@ or
 - RLS prevents cross-user access
 
 ### ST-005: Findings dashboard — ranked list with score breakdown
-- **Status:** planned | **Points:** 3 | **Priority:** high | **Epic:** ST-E4
+- **Status:** review | **Points:** 3 | **Priority:** high | **Epic:** ST-E4
 - **Description:** # ST-005: Findings dashboard + drill-down
 
 ## Goal
@@ -391,7 +394,7 @@ Show all captured workflows ranked by current score, drill into any one for the 
 - Score badges use the right tone for each score band
 
 ### ST-006: Audit report v1 — Claude-assisted Markdown
-- **Status:** planned | **Points:** 2 | **Priority:** medium | **Epic:** ST-E5
+- **Status:** review | **Points:** 2 | **Priority:** medium | **Epic:** ST-E5
 - **Description:** # ST-006: Audit report (Claude-assisted Markdown)
 
 ## Goal
@@ -458,7 +461,7 @@ ANTHROPIC_API_KEY is read from Deno.env (set in the Supabase project's secrets �
 - supabase/functions/ss-report/index.ts in the repo matches the deployed function exactly
 
 ### ST-007: Workflow editing + delete
-- **Status:** in_progress | **Points:** 3 | **Priority:** high | **Epic:** ST-E2
+- **Status:** blocked | **Points:** 3 | **Priority:** high | **Epic:** ST-E2
 - **Description:** # ST-007: Edit and delete captured workflows
 
 ## Goal
@@ -511,7 +514,7 @@ v1 ships Markdown-only reports. Customers want a polished PDF for their board, a
 - Generation happens entirely client-side
 
 ### ST-009: CSV upload — capture multiple workflows at once
-- **Status:** in_progress | **Points:** 5 | **Priority:** medium | **Epic:** ST-E2
+- **Status:** blocked | **Points:** 5 | **Priority:** medium | **Epic:** ST-E2
 - **Description:** # ST-009: CSV import
 
 ## Goal
