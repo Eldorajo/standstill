@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --border: 215 25% 27%;
+    --accent: 234 89% 74%;
+    --muted: 215 20% 65%;
+  }
+
   * {
     @apply border-border;
   }

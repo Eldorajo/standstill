@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Capture from './pages/Capture'
 import Findings from './pages/Findings'
 import FindingDetail from './pages/FindingDetail'
+import Reports from './pages/Reports'
 import './index.css'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/capture" element={<Capture />} />
             <Route path="/findings" element={<Findings />} />
             <Route path="/findings/:id" element={<FindingDetail />} />
+            <Route path="/reports" element={<Reports />} />
           </Route>
         </Routes>
       </div>
