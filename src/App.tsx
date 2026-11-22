@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import AuthGuard from './components/AuthGuard'
 import Layout from './components/Layout'
 import Login from './pages/Login'
@@ -6,24 +6,21 @@ import Capture from './pages/Capture'
 import Findings from './pages/Findings'
 import FindingDetail from './pages/FindingDetail'
 import Reports from './pages/Reports'
-import './index.css'
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<AuthGuard><Layout /></AuthGuard>}>
-            <Route path="/" element={<Navigate to="/findings" replace />} />
-            <Route path="/capture" element={<Capture />} />
-            <Route path="/findings" element={<Findings />} />
-            <Route path="/findings/:id" element={<FindingDetail />} />
-            <Route path="/reports" element={<Reports />} />
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route element={<AuthGuard><Layout /></AuthGuard>}>
+          <Route path="/" element={<Navigate to="/findings" replace />} />
+          <Route path="/capture" element={<Capture />} />
+          <Route path="/findings" element={<Findings />} />
+          <Route path="/findings/:id" element={<FindingDetail />} />
+          <Route path="/reports" element={<Reports />} />
+        </Route>
+      </Routes>
+    </div>
   )
 }
 
